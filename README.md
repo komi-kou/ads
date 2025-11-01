@@ -1,189 +1,147 @@
-# Ad Analytics Tool - Meta & Google 広告分析プラットフォーム
+# メタ広告とGoogle広告の分析ツール
 
-gomarble-mcp-serverを活用したMeta広告とGoogle広告の統合分析ツール
+gomarble-mcp-serverを活用したメタ広告とGoogle広告の分析ツールです。マルチアカウント機能により、各ユーザーが複数の広告アカウントを管理し、分析結果を取得できます。
 
-## 機能
+## 主な機能
 
-### 主要機能
-- **マルチアカウント管理**: Meta広告とGoogle広告の複数アカウントを一元管理
-- **リアルタイム分析**: 広告パフォーマンスをリアルタイムで分析
-- **MCP連携**: Claude AIと連携して高度な分析と最適化提案
-- **データエクスポート**: 分析結果をCSV形式でエクスポート
-- **美しいUI**: TailwindCSSを使用したモダンなデザイン
+1. **マルチアカウント管理**
+   - Google AdsとMeta Adsのアカウント連携
+   - OAuth認証による安全なトークン管理
+   - アカウントごとのデータ管理
 
-### 分析機能
-- インプレッション、クリック、費用、コンバージョンの推移
-- キャンペーン別パフォーマンス比較
-- CTR、CPC、CVR、CPAなどの主要指標
-- 期間別トレンド分析
+2. **広告分析**
+   - gomarble-mcp-serverを使用した高度な分析
+   - メトリクス（インプレッション、クリック、費用、CTR、CPC、コンバージョン等）の取得
+   - インサイトと推奨事項の自動生成
+
+3. **定期レポート送信**
+   - 週次または月次の定期レポート生成
+   - チャットワークへの自動送信機能
+   - 報告資料の自動生成
 
 ## セットアップ
 
-### 必要要件
-- Node.js 18以上
-- npm または yarn
-- Meta広告アカウント
-- Google広告アカウント
+### 1. 依存関係のインストール
 
-### インストール手順
-
-1. リポジトリをクローン
-```bash
-git clone [repository-url]
-cd ad-analytics-tool
-```
-
-2. 依存関係をインストール
 ```bash
 npm install
+cd mcp-server && npm install
 ```
 
-3. MCPサーバーの依存関係をインストール
+### 2. データベースのセットアップ
+
+PostgreSQLデータベースを作成し、Prismaマイグレーションを実行します。
+
 ```bash
-cd mcp-server
-npm install
-cd ..
+# 環境変数を設定
+cp .env.example .env
+# .envファイルを編集してデータベースURLなどを設定
+
+# Prismaマイグレーション
+npx prisma migrate dev
+
+# Prismaクライアント生成
+npx prisma generate
 ```
 
-4. 環境変数を設定
+### 3. 環境変数の設定
+
+`.env`ファイルに以下の環境変数を設定してください：
+
+- `DATABASE_URL`: PostgreSQLデータベースの接続URL
+- `JWT_SECRET`: JWTトークンの秘密鍵
+- `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_DEVELOPER_TOKEN`: Google Ads APIの認証情報
+- `META_APP_ID`, `META_APP_SECRET`: Meta Ads APIの認証情報
+- `INTERNAL_API_KEY`: 定期レポート実行用の内部APIキー
+
+### 4. アプリケーションの起動
+
 ```bash
-cp .env.local.example .env.local
-```
+# Next.jsアプリケーション（ポート3000）
+npm run dev
 
-`.env.local`ファイルを編集して、必要なAPIキーと認証情報を設定：
-
-- `META_APP_ID`: Facebook App ID
-- `META_APP_SECRET`: Facebook App Secret
-- `GOOGLE_CLIENT_ID`: Google OAuth Client ID
-- `GOOGLE_CLIENT_SECRET`: Google OAuth Client Secret
-- `GOOGLE_DEVELOPER_TOKEN`: Google Ads Developer Token
-
-### APIキーの取得方法
-
-#### Meta広告（Facebook）
-1. [Facebook Developers](https://developers.facebook.com/)にアクセス
-2. 新しいアプリを作成
-3. Marketing APIを追加
-4. App IDとApp Secretを取得
-
-#### Google広告
-1. [Google Cloud Console](https://console.cloud.google.com/)にアクセス
-2. 新しいプロジェクトを作成
-3. Google Ads APIを有効化
-4. OAuth 2.0クライアントIDを作成
-5. [Google Ads API Center](https://ads.google.com/aw/apicenter)でDeveloper Tokenを取得
-
-## 起動方法
-
-1. MCPサーバーを起動（新しいターミナル）
-```bash
+# MCPサーバー（ポート3001）
 cd mcp-server
 npm start
 ```
 
-2. Next.jsアプリケーションを起動
-```bash
-npm run dev
-```
+## APIエンドポイント
 
-3. ブラウザで http://localhost:3000 にアクセス
+### 認証
+- `POST /api/auth/login` - ログイン
+- `POST /api/auth/logout` - ログアウト
+- `GET /api/auth/me` - 現在のユーザー情報取得
 
-## 使い方
+### アカウント管理
+- `GET /api/accounts` - アカウント一覧取得
+- `POST /api/accounts` - アカウント追加
+- `PUT /api/accounts` - アカウント更新
+- `DELETE /api/accounts` - アカウント削除
 
-### 初回ログイン
-1. メールアドレスとパスワードを入力してログイン
-2. 初回の場合は自動的にアカウントが作成されます
+### 広告連携
+- `GET /api/google/auth` - Google Ads認証開始
+- `GET /api/google/callback` - Google Ads認証コールバック
+- `GET /api/meta/auth` - Meta Ads認証開始
+- `GET /api/meta/callback` - Meta Ads認証コールバック
 
-### アカウント連携
-1. ダッシュボードの「アカウント管理」に移動
-2. Meta広告またはGoogle広告の「追加」ボタンをクリック
-3. 各プラットフォームの認証画面でログイン
-4. 必要な権限を許可
+### データ取得
+- `POST /api/data/google` - Google Adsデータ取得
+- `POST /api/data/meta` - Meta Adsデータ取得
 
-### 分析の実行
-1. サイドバーから分析したいアカウントを選択
-2. 日付範囲を選択
-3. リアルタイムでパフォーマンスデータを確認
-4. 必要に応じてCSVエクスポート
+### 分析・レポート
+- `POST /api/mcp/analyze` - 分析実行（gomarble-mcp-server経由）
+- `POST /api/reports/generate` - レポート生成
+- `POST /api/reports/schedule` - 定期レポート設定
+- `GET /api/reports/schedule` - 定期レポート設定取得
+- `POST /api/reports/process-scheduled` - 定期レポート実行（cronジョブ用）
 
-## MCP（Model Context Protocol）連携
+## 定期レポートの設定
 
-このツールはgomarble-mcp-serverと連携して、Claude AIによる高度な分析が可能です。
-
-### MCP設定（Claude Desktop）
-1. Claude Desktopの設定を開く
-2. Extensions → MCP Serversで新しいサーバーを追加
-3. 以下の設定を使用：
+定期レポートは、`/api/reports/schedule`エンドポイントで設定できます。
 
 ```json
 {
-  "name": "ad-analytics-mcp",
-  "command": "node",
-  "args": ["mcp-server/server.js"],
-  "env": {
-    "MCP_SERVER_PORT": "3001"
-  }
+  "accountId": "account_id",
+  "frequency": "weekly", // または "monthly"
+  "dayOfWeek": 1, // 週次の場合: 0=日曜日, 1=月曜日, ...
+  "dayOfMonth": 1, // 月次の場合: 1-31
+  "chatworkRoomId": "room_id",
+  "chatworkApiToken": "api_token"
 }
 ```
 
-### Claude連携機能
-- 広告パフォーマンスの自動分析
-- 最適化提案の生成
-- 異常検知とアラート
-- レポート作成支援
+定期レポートは、`/api/reports/process-scheduled`エンドポイントをcronジョブで定期的に呼び出すことで実行されます。
 
-## プロジェクト構造
+### Cronジョブの設定例（1時間ごと）
 
+```bash
+# crontabに追加
+0 * * * * curl -X POST http://localhost:3000/api/reports/process-scheduled -H "Authorization: Bearer YOUR_INTERNAL_API_KEY"
 ```
-ad-analytics-tool/
-├── app/                    # Next.js App Router
-│   ├── api/               # APIルート
-│   ├── dashboard/         # ダッシュボード
-│   └── page.tsx           # ホームページ
-├── components/            # Reactコンポーネント
-├── lib/                   # ユーティリティ関数
-├── mcp-server/           # MCPサーバー実装
-└── public/               # 静的ファイル
-```
+
+## チャットワーク連携
+
+チャットワークにレポートを送信するには、チャットワークのAPIトークンとルームIDが必要です。
+
+1. [Chatwork API](https://developer.chatwork.com/)でAPIトークンを取得
+2. 送信先のルームIDを取得
+3. 定期レポート設定時に`chatworkRoomId`と`chatworkApiToken`を指定
 
 ## 技術スタック
 
-- **フロントエンド**: Next.js 14, React 18, TypeScript
-- **スタイリング**: TailwindCSS
-- **状態管理**: Zustand
-- **データフェッチ**: React Query (TanStack Query)
-- **チャート**: Recharts
+- **フロントエンド/バックエンド**: Next.js 16, React 19, TypeScript
+- **データベース**: PostgreSQL (Prisma ORM)
 - **認証**: JWT
-- **API連携**: Meta Marketing API, Google Ads API
-- **MCP**: gomarble-mcp-server
+- **広告API**: Google Ads API, Meta Ads API
+- **分析**: gomarble-mcp-server
+- **通知**: Chatwork API
 
-## セキュリティ
+## 注意事項
 
-- トークンは暗号化して保存
-- HTTPS通信を使用
-- 環境変数で機密情報を管理
-- JWTによる認証
-
-## トラブルシューティング
-
-### よくある問題
-
-1. **Meta API認証エラー**
-   - App IDとApp Secretが正しいか確認
-   - リダイレクトURIが設定と一致しているか確認
-
-2. **Google Ads APIエラー**
-   - Developer Tokenが承認されているか確認
-   - OAuth scopeが適切に設定されているか確認
-
-3. **MCP接続エラー**
-   - MCPサーバーが起動しているか確認
-   - ポート3001が使用可能か確認
+- Mockデータやサンプルデータは使用していません。すべて実際のAPI連携を行います。
+- 認証情報はデータベースに暗号化して保存されます。
+- 定期レポートの実行には、cronジョブまたはスケジューラーサービスの設定が必要です。
 
 ## ライセンス
 
-MIT License
-
-## サポート
-
-問題が発生した場合は、Issueを作成してください。
+ISC

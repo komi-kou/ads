@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateToken, hashPassword, comparePassword } from '@/lib/auth';
 import { cookies } from 'next/headers';
-
-// 仮のユーザーデータベース（実際にはPrismaやDBを使用）
-const users = new Map();
+import { prisma } from '@/lib/db';
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,19 +14,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ユーザーを取得または作成（デモ用）
-    let user = users.get(email);
+    // ユーザーを取得
+    let user = await prisma.user.findUnique({
+      where: { email },
+    });
     
     if (!user) {
       // 新規ユーザーの場合は作成
       const hashedPassword = await hashPassword(password);
-      user = {
-        id: `user_${Date.now()}`,
-        email,
-        name: email.split('@')[0],
-        password: hashedPassword,
-      };
-      users.set(email, user);
+      user = await prisma.user.create({
+        data: {
+          email,
+          name: email.split('@')[0],
+          password: hashedPassword,
+        },
+      });
     } else {
       // 既存ユーザーの場合はパスワード検証
       const isValid = await comparePassword(password, user.password);
