@@ -6,7 +6,7 @@ import { MetricsCards } from "./MetricsCards";
 import { PerformanceChart } from "./PerformanceChart";
 import { CampaignTable } from "./CampaignTable";
 import { AnalysisPanel } from "./AnalysisPanel";
-import { Calendar, RefreshCw, Download, Brain } from "lucide-react";
+import { Calendar, RefreshCw, Download, Brain, Facebook, Globe } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 
 interface AnalyticsViewProps {
@@ -147,45 +147,68 @@ export function AnalyticsView({ account }: AnalyticsViewProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Header with Date Range and Actions */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h2 className="text-xl font-bold">{account.accountName}</h2>
-          <p className="text-sm text-muted-foreground">
-            {account.platform === "meta" ? "Meta広告" : "Google広告"} パフォーマンス分析
-          </p>
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <div className={`p-3 rounded-xl shadow-md ${
+            account.platform === "meta" 
+              ? "bg-blue-100" 
+              : "bg-green-100"
+          }`}>
+            {account.platform === "meta" ? (
+              <Facebook className="h-6 w-6 text-blue-600" />
+            ) : (
+              <Globe className="h-6 w-6 text-green-600" />
+            )}
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold">{account.accountName}</h2>
+            <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+              <span className="inline-flex items-center gap-1.5">
+                <span className={`h-2 w-2 rounded-full ${
+                  account.platform === "meta" ? "bg-blue-500" : "bg-green-500"
+                }`}></span>
+                {account.platform === "meta" ? "Meta広告" : "Google広告"} パフォーマンス分析
+              </span>
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-card rounded-md px-3 py-2 border">
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 bg-card rounded-lg px-4 py-2.5 border-2 shadow-sm hover:shadow-md transition-shadow">
+            <Calendar className="h-4 w-4 text-primary" />
             <input
               type="date"
               value={dateRange.start}
               onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
-              className="bg-transparent text-sm outline-none"
+              className="bg-transparent text-sm outline-none font-medium"
             />
             <span className="text-muted-foreground">-</span>
             <input
               type="date"
               value={dateRange.end}
               onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
-              className="bg-transparent text-sm outline-none"
+              className="bg-transparent text-sm outline-none font-medium"
             />
           </div>
 
           <button
             onClick={() => refetch()}
             className="btn-secondary flex items-center gap-2"
+            disabled={isLoading}
           >
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
             更新
           </button>
 
           <button
             onClick={() => setShowAnalysis(!showAnalysis)}
-            className={`btn-secondary flex items-center gap-2 ${showAnalysis ? 'bg-primary text-primary-foreground' : ''}`}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${
+              showAnalysis 
+                ? 'bg-gradient-to-r from-purple-500 to-purple-600 text-white shadow-md' 
+                : 'btn-secondary hover:bg-purple-50 hover:border-purple-200'
+            }`}
           >
             <Brain className="h-4 w-4" />
             AI分析
@@ -207,18 +230,21 @@ export function AnalyticsView({ account }: AnalyticsViewProps) {
           <MetricsCards metrics={analyticsData.metrics} isLoading={isLoading} />
 
           {/* Performance Chart */}
-          <div className="card p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">パフォーマンス推移</h3>
-              <div className="flex gap-2">
+          <div className="card p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+              <div>
+                <h3 className="text-xl font-bold mb-1">パフォーマンス推移</h3>
+                <p className="text-sm text-muted-foreground">期間中の主要指標の推移を確認できます</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
                 {(["impressions", "clicks", "spend", "conversions"] as const).map((metric) => (
                   <button
                     key={metric}
                     onClick={() => setSelectedMetric(metric)}
-                    className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       selectedMetric === metric
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary hover:bg-secondary/80"
+                        ? "bg-primary text-primary-foreground shadow-md scale-105"
+                        : "bg-secondary hover:bg-secondary/80 hover:scale-105"
                     }`}
                   >
                     {metric === "impressions" && "表示回数"}

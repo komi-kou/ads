@@ -3,6 +3,7 @@
 import {
   LineChart,
   Line,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -35,11 +36,17 @@ export function PerformanceChart({ data, metric }: PerformanceChartProps) {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload[0]) {
       return (
-        <div className="bg-background border rounded-md p-3 shadow-lg">
-          <p className="text-sm font-medium">{label}</p>
-          <p className="text-sm mt-1" style={{ color: config.color }}>
-            {config.label}: {config.formatter(payload[0].value)}
-          </p>
+        <div className="bg-card border-2 border-border rounded-lg p-4 shadow-xl">
+          <p className="text-sm font-semibold text-muted-foreground mb-2">{label}</p>
+          <div className="flex items-center gap-2">
+            <div 
+              className="w-3 h-3 rounded-full" 
+              style={{ backgroundColor: config.color }}
+            ></div>
+            <p className="text-base font-bold" style={{ color: config.color }}>
+              {config.label}: {config.formatter(payload[0].value)}
+            </p>
+          </div>
         </div>
       );
     }
@@ -52,34 +59,54 @@ export function PerformanceChart({ data, metric }: PerformanceChartProps) {
   };
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-        <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-        <XAxis
-          dataKey="date"
-          tickFormatter={formatDate}
-          className="text-xs"
-          stroke="var(--muted-foreground)"
-        />
-        <YAxis
-          tickFormatter={(value) => {
-            if (metric === "spend") return `¥${(value / 1000).toFixed(0)}k`;
-            if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
-            return value;
-          }}
-          className="text-xs"
-          stroke="var(--muted-foreground)"
-        />
-        <Tooltip content={<CustomTooltip />} />
-        <Line
-          type="monotone"
-          dataKey={metric}
-          stroke={config.color}
-          strokeWidth={2}
-          dot={{ r: 4, fill: config.color }}
-          activeDot={{ r: 6 }}
-        />
-      </LineChart>
-    </ResponsiveContainer>
+    <div className="w-full">
+      <ResponsiveContainer width="100%" height={350}>
+        <LineChart data={data} margin={{ top: 10, right: 30, left: 20, bottom: 10 }}>
+          <defs>
+            <linearGradient id={`gradient-${metric}`} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={config.color} stopOpacity={0.3}/>
+              <stop offset="95%" stopColor={config.color} stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" className="stroke-border opacity-30" />
+          <XAxis
+            dataKey="date"
+            tickFormatter={formatDate}
+            className="text-xs"
+            stroke="hsl(var(--muted-foreground))"
+            tick={{ fill: "hsl(var(--muted-foreground))" }}
+          />
+          <YAxis
+            tickFormatter={(value) => {
+              if (metric === "spend") return `¥${(value / 1000).toFixed(0)}k`;
+              if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
+              return value.toString();
+            }}
+            className="text-xs"
+            stroke="hsl(var(--muted-foreground))"
+            tick={{ fill: "hsl(var(--muted-foreground))" }}
+          />
+          <Tooltip 
+            content={<CustomTooltip />}
+            cursor={{ stroke: config.color, strokeWidth: 2, strokeDasharray: '5 5' }}
+          />
+          <Line
+            type="monotone"
+            dataKey={metric}
+            stroke={config.color}
+            strokeWidth={3}
+            dot={{ r: 5, fill: config.color, strokeWidth: 2, stroke: '#fff' }}
+            activeDot={{ r: 7, fill: config.color, stroke: '#fff', strokeWidth: 2 }}
+            fill={`url(#gradient-${metric})`}
+          />
+          <Area
+            type="monotone"
+            dataKey={metric}
+            stroke="none"
+            fill={`url(#gradient-${metric})`}
+          />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
   );
 }

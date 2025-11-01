@@ -132,30 +132,37 @@ export function AccountManager() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="space-y-6 animate-fade-in">
+      <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-6 gap-4">
         <div>
-          <h2 className="text-2xl font-bold">広告アカウント管理</h2>
-          <p className="text-muted-foreground mt-1">
+          <h2 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-2">
+            広告アカウント管理
+          </h2>
+          <p className="text-muted-foreground text-lg">
             Meta広告とGoogle広告のアカウントを接続して管理します
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Meta Ads Section */}
-        <div className="card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Facebook className="h-5 w-5 text-blue-600" />
-              <h3 className="text-lg font-semibold">Meta広告</h3>
+        <div className="card p-6 hover:shadow-lg transition-shadow border-2 border-blue-100">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Facebook className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Meta広告</h3>
+                <p className="text-xs text-muted-foreground">Facebook・Instagram広告</p>
+              </div>
             </div>
             <button
               onClick={() => handleAddAccount("meta")}
               disabled={isAddingAccount}
-              className="btn-primary text-sm flex items-center gap-1"
+              className="btn-primary text-sm flex items-center gap-2 shadow-md hover:shadow-lg"
             >
-              <Plus className="h-3 w-3" />
+              <Plus className="h-4 w-4" />
               追加
             </button>
           </div>
@@ -164,11 +171,24 @@ export function AccountManager() {
             {accounts.filter((a) => a.platform === "meta").map((account) => (
               <div
                 key={account.id}
-                className="flex items-center justify-between p-3 rounded-md bg-secondary/50"
+                className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-blue-50/50 to-transparent border-2 border-blue-100 hover:border-blue-300 transition-all hover:shadow-md"
               >
                 <div className="flex-1">
-                  <p className="font-medium text-sm">{account.accountName}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-semibold text-sm">{account.accountName}</p>
+                    {account.isActive ? (
+                      <span className="flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                        <Check className="h-3 w-3" />
+                        アクティブ
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                        <X className="h-3 w-3" />
+                        無効
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-1">
                     ID: {account.accountId}
                   </p>
                   {account.lastSynced && (
@@ -177,19 +197,12 @@ export function AccountManager() {
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  {account.isActive ? (
-                    <Check className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <X className="h-4 w-4 text-red-600" />
-                  )}
-                  <button
-                    onClick={() => handleRemoveAccount(account.id)}
-                    className="text-destructive hover:text-destructive/80 transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
+                <button
+                  onClick={() => handleRemoveAccount(account.id)}
+                  className="text-destructive hover:text-destructive/80 transition-all hover:scale-110 p-2 rounded-lg hover:bg-red-50"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
               </div>
             ))}
 
@@ -202,18 +215,23 @@ export function AccountManager() {
         </div>
 
         {/* Google Ads Section */}
-        <div className="card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Globe className="h-5 w-5 text-green-600" />
-              <h3 className="text-lg font-semibold">Google広告</h3>
+        <div className="card p-6 hover:shadow-lg transition-shadow border-2 border-green-100">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Globe className="h-6 w-6 text-green-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Google広告</h3>
+                <p className="text-xs text-muted-foreground">Google広告アカウント</p>
+              </div>
             </div>
             <button
               onClick={() => handleAddAccount("google")}
               disabled={isAddingAccount}
-              className="btn-primary text-sm flex items-center gap-1"
+              className="btn-primary text-sm flex items-center gap-2 shadow-md hover:shadow-lg"
             >
-              <Plus className="h-3 w-3" />
+              <Plus className="h-4 w-4" />
               追加
             </button>
           </div>
@@ -222,11 +240,24 @@ export function AccountManager() {
             {accounts.filter((a) => a.platform === "google").map((account) => (
               <div
                 key={account.id}
-                className="flex items-center justify-between p-3 rounded-md bg-secondary/50"
+                className="flex items-center justify-between p-4 rounded-lg bg-gradient-to-r from-green-50/50 to-transparent border-2 border-green-100 hover:border-green-300 transition-all hover:shadow-md"
               >
                 <div className="flex-1">
-                  <p className="font-medium text-sm">{account.accountName}</p>
-                  <p className="text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="font-semibold text-sm">{account.accountName}</p>
+                    {account.isActive ? (
+                      <span className="flex items-center gap-1 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">
+                        <Check className="h-3 w-3" />
+                        アクティブ
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full">
+                        <X className="h-3 w-3" />
+                        無効
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mb-1">
                     ID: {account.accountId}
                   </p>
                   {account.lastSynced && (
@@ -235,19 +266,12 @@ export function AccountManager() {
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
-                  {account.isActive ? (
-                    <Check className="h-4 w-4 text-green-600" />
-                  ) : (
-                    <X className="h-4 w-4 text-red-600" />
-                  )}
-                  <button
-                    onClick={() => handleRemoveAccount(account.id)}
-                    className="text-destructive hover:text-destructive/80 transition-colors"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
+                <button
+                  onClick={() => handleRemoveAccount(account.id)}
+                  className="text-destructive hover:text-destructive/80 transition-all hover:scale-110 p-2 rounded-lg hover:bg-red-50"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
               </div>
             ))}
 
@@ -261,29 +285,28 @@ export function AccountManager() {
       </div>
 
       {/* Instructions */}
-      <div className="card p-6 bg-secondary/20">
-        <h3 className="font-semibold mb-3 flex items-center gap-2">
-          <Link2 className="h-4 w-4" />
-          接続手順
+      <div className="card p-6 bg-gradient-to-br from-primary/5 to-primary/10 border-2 border-primary/20">
+        <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
+          <Link2 className="h-5 w-5 text-primary" />
+          接続手順ガイド
         </h3>
-        <ol className="space-y-2 text-sm text-muted-foreground">
-          <li className="flex gap-2">
-            <span className="font-semibold">1.</span>
-            <span>接続したいプラットフォームの「追加」ボタンをクリック</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="font-semibold">2.</span>
-            <span>各プラットフォームの認証画面でログイン</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="font-semibold">3.</span>
-            <span>必要な権限を許可</span>
-          </li>
-          <li className="flex gap-2">
-            <span className="font-semibold">4.</span>
-            <span>自動的にアカウントが追加されます</span>
-          </li>
-        </ol>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[
+            { step: "1", text: "接続したいプラットフォームの「追加」ボタンをクリック" },
+            { step: "2", text: "各プラットフォームの認証画面でログイン" },
+            { step: "3", text: "必要な権限を許可" },
+            { step: "4", text: "自動的にアカウントが追加されます" },
+          ].map((item) => (
+            <div key={item.step} className="flex items-start gap-3 p-3 bg-card/50 rounded-lg">
+              <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm">
+                {item.step}
+              </div>
+              <p className="text-sm text-foreground font-medium leading-relaxed pt-1">
+                {item.text}
+              </p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Message Display */}
