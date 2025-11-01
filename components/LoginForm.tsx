@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
-import { Mail, Lock, Loader2 } from "lucide-react";
+import { Mail, Lock, Loader2, BarChart3 } from "lucide-react";
 
 const loginSchema = z.object({
   email: z.string().email("有効なメールアドレスを入力してください"),
@@ -61,11 +61,16 @@ export function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
-      <div className="card p-8">
+    <div className="w-full max-w-md mx-auto animate-fade-in">
+      <div className="card p-8 shadow-xl border-2">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">Ad Analytics Tool</h1>
-          <p className="text-muted-foreground">Meta & Google 広告分析プラットフォーム</p>
+          <div className="bg-gradient-to-br from-primary/20 to-primary/10 rounded-full p-4 w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+            <BarChart3 className="h-10 w-10 text-primary" />
+          </div>
+          <h1 className="text-3xl font-bold mb-2 bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+            Ad Analytics Tool
+          </h1>
+          <p className="text-muted-foreground text-lg">Meta & Google 広告分析プラットフォーム</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">

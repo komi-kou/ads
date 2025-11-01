@@ -92,16 +92,20 @@ export function AnalysisPanel({ account, data }: AnalysisPanelProps) {
 
       {/* Analysis Content */}
       {isLoading ? (
-        <div className="card p-8 text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-primary" />
-          <p className="text-muted-foreground">AI分析を実行中...</p>
+        <div className="card p-12 text-center animate-fade-in">
+          <Loader2 className="h-10 w-10 animate-spin mx-auto mb-4 text-primary" />
+          <p className="text-muted-foreground font-medium">AI分析を実行中...</p>
+          <p className="text-sm text-muted-foreground mt-2">データを分析しています。しばらくお待ちください。</p>
         </div>
       ) : analysis ? (
-        <div className="space-y-6">
+        <div className="space-y-6 animate-fade-in">
           {/* Summary */}
-          <div className="card p-6">
-            <h3 className="text-lg font-semibold mb-4">分析サマリー</h3>
-            <p className="text-sm text-muted-foreground whitespace-pre-line">
+          <div className="card p-6 bg-gradient-to-br from-primary/5 to-transparent border-2 border-primary/20 shadow-md">
+            <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-primary" />
+              分析サマリー
+            </h3>
+            <p className="text-sm text-foreground leading-relaxed whitespace-pre-line bg-card/50 p-4 rounded-lg">
               {analysis.summary}
             </p>
           </div>

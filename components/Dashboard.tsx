@@ -72,7 +72,7 @@ export function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen bg-background">
+    <div className="flex h-screen bg-gradient-to-br from-background via-background to-secondary/20">
       <Sidebar
         activeView={activeView}
         onViewChange={setActiveView}
@@ -80,53 +80,65 @@ export function Dashboard() {
       />
 
       <main className="flex-1 overflow-auto">
-        <header className="border-b bg-card px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">
-                {activeView === "analytics" ? "分析ダッシュボード" : "アカウント管理"}
-              </h1>
-              <p className="text-sm text-muted-foreground mt-1">
-                {user.name} としてログイン中
-              </p>
-            </div>
-            <div className="flex items-center gap-4">
-              {selectedAccount && (
-                <div className="text-sm">
-                  <span className="text-muted-foreground">選択中:</span>
-                  <span className="ml-2 font-medium">
-                    {selectedAccount.accountName} ({selectedAccount.platform === 'meta' ? 'Meta' : 'Google'})
-                  </span>
+        <header className="border-b bg-card/80 backdrop-blur-sm shadow-sm sticky top-0 z-10">
+          <div className="px-6 py-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div>
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+                    {activeView === "analytics" ? "分析ダッシュボード" : "アカウント管理"}
+                  </h1>
+                  <div className="flex items-center gap-2 mt-1">
+                    <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
+                    <p className="text-sm text-muted-foreground">
+                      {user.name} としてログイン中
+                    </p>
+                  </div>
                 </div>
-              )}
-              <button
-                onClick={handleLogout}
-                className="btn-secondary flex items-center gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                ログアウト
-              </button>
+              </div>
+              <div className="flex items-center gap-3">
+                {selectedAccount && (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg border border-primary/20">
+                    <div className={`h-2 w-2 rounded-full ${
+                      selectedAccount.platform === 'meta' ? 'bg-blue-500' : 'bg-green-500'
+                    }`}></div>
+                    <div className="text-sm">
+                      <span className="text-muted-foreground text-xs">選択中:</span>
+                      <span className="ml-2 font-semibold">
+                        {selectedAccount.accountName}
+                      </span>
+                      <span className="ml-2 text-xs text-muted-foreground">
+                        ({selectedAccount.platform === 'meta' ? 'Meta' : 'Google'})
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </header>
 
-        <div className="p-6">
+        <div className="p-6 max-w-7xl mx-auto">
           {activeView === "analytics" ? (
             selectedAccount ? (
               <AnalyticsView account={selectedAccount} />
             ) : (
-              <div className="card p-12 text-center">
-                <BarChart3 className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-                <h2 className="text-xl font-semibold mb-2">アカウントを選択してください</h2>
-                <p className="text-muted-foreground mb-4">
+              <div className="card p-12 text-center max-w-2xl mx-auto animate-fade-in">
+                <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+                  <BarChart3 className="h-12 w-12 text-primary" />
+                </div>
+                <h2 className="text-2xl font-bold mb-3">アカウントを選択してください</h2>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
                   分析を開始するには、左側のメニューからアカウントを選択するか、
+                  <br />
                   アカウント管理画面で新しいアカウントを追加してください。
                 </p>
                 <button
                   onClick={() => setActiveView("accounts")}
-                  className="btn-primary"
+                  className="btn-primary flex items-center gap-2 mx-auto"
                 >
-                  アカウントを追加
+                  <Settings className="h-4 w-4" />
+                  アカウント管理へ移動
                 </button>
               </div>
             )
